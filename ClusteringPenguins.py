@@ -1,32 +1,18 @@
+from allDataframes import df_og
+from allDataframes import df_pinguinos
+from allDataframes import df_preprocesado
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
+
 st.title("Clustering de pingüinos")
-st.write("Se busca agrupar pingüinos en distintas especies según información física (masa, tamaño de aleta, etc.).")
-#DATASET
-st.markdown("## **Datasets de pingüinos**")
-    #ORIGINAL
-st.markdown("### Dataset original:")
-df_og = pd.read_csv("penguins.csv")
-st.write(df_og)
-st.write("El dataset presenta datos nulos e incoherentes los cuales se deben limpiar")
-    #LIMPIADO DATOS NULOS E INCOHERENTES
-st.markdown("### Dataset limpio:")
-df_pinguinos = df_og.dropna(axis='rows')
-df_pinguinos = df_pinguinos.drop([9, 14])
-st.write(df_pinguinos)
-st.write("Ahora se convierte la variable categórica (get_dummies) y se estandarizan los datos (StandardScaler)")
-    #DATOS ESCALADOS
+
+from sklearn.preprocessing import StandardScaler
 df_clean = pd.get_dummies(df_pinguinos).drop("sex_.", axis=1)
 scaler = StandardScaler()
 X = scaler.fit_transform(df_clean)
-df_preprocesado = pd.DataFrame(data=X, columns=df_clean.columns)
-st.markdown("### Dataset con datos escalados por StandardScaler:")
-st.write(df_preprocesado)
-
 
 #CLUSTERING KMEANS
 from sklearn.cluster import KMeans
@@ -51,7 +37,7 @@ r_state = st.number_input("Random state", 1, 50)
 kmeans = KMeans(n_clusters=n_clust, random_state=r_state, n_init=10)
 kmeans_res = kmeans.fit_predict(df_preprocesado)
 df_kmeans = df_preprocesado.copy()
-df_kmeans['cluster'] = kmeans_res
+df_kmeans.insert(0, "cluster", kmeans_res)
     #MÉTRICAS DE EVALUACIÓN
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 silhouette = silhouette_score(df_preprocesado, kmeans_res)

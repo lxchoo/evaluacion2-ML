@@ -18,6 +18,5 @@ st.markdown("### Dataset limpio:")
 st.write(df_pinguinos)
 st.write("Ahora se convierte la variable categórica (get_dummies) y se estandarizan los datos (StandardScaler)")
     #DATOS ESCALADOS
-df_preprocesado
 st.markdown("### Dataset con datos escalados por StandardScaler:")
 st.write(df_preprocesado)

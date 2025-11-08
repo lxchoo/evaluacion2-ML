@@ -1,5 +1,6 @@
 from allDataframes import df_og
 from allDataframes import df_pinguinos
+from allDataframes import df_clean
 from allDataframes import df_preprocesado
 import streamlit as st
 import pandas as pd
@@ -10,7 +11,6 @@ import matplotlib.pyplot as plt
 st.title("Clustering de pingüinos")
 
 from sklearn.preprocessing import StandardScaler
-df_clean = pd.get_dummies(df_pinguinos).drop("sex_.", axis=1)
 scaler = StandardScaler()
 X = scaler.fit_transform(df_clean)
 
@@ -31,14 +31,16 @@ ax.set_title('Gráfico del codo')
 st.pyplot(fig)
 st.write("Lo más optimo sería usar 4 clusters en el agrupamiento.")
     #CLUSTERING
-st.markdown("### Clustering")
-n_clust = st.number_input("Cantidad de clusters", 2, 10)
+st.markdown("## Parámetros")
+num_clusters = st.number_input("Cantidad de clusters", 2, 10)
 r_state = st.number_input("Random state", 1, 50)
-kmeans = KMeans(n_clusters=n_clust, random_state=r_state, n_init=10)
+num_init = st.number_input("n_init", 1, 50)
+kmeans = KMeans(n_clusters=num_clusters, random_state=r_state, n_init=num_init)
 kmeans_res = kmeans.fit_predict(df_preprocesado)
 df_kmeans = df_preprocesado.copy()
 df_kmeans.insert(0, "cluster", kmeans_res)
     #MÉTRICAS DE EVALUACIÓN
+st.markdown("## Métricas de evaluación")
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 silhouette = silhouette_score(df_preprocesado, kmeans_res)
 db_index = davies_bouldin_score(df_preprocesado, kmeans_res)
@@ -47,6 +49,7 @@ st.write("Silhouette Score: ", silhouette)
 st.write("Davies-Bouldin Index: ", db_index)
 st.write("Calinski-Harabasz Index: ", ch_index)
     #RESULTADOS
+st.markdown("## Resultados")
 st.write("Dataset con columna 'cluster' indicando el grupo del pingüino")
 st.write(df_kmeans)
 st.write("Cantidad de pingüinos por cluster")
@@ -75,7 +78,7 @@ ax.legend()
 plt.colorbar(scatter2, ax=ax, label='Cluster')
 st.pyplot(fig1)
     #VISUALIZACIÓN DE ESPECIES CON GRÁFICO ARAÑA
-st.markdown("## **Visualización de especies con gráfico**")
+st.markdown("### **Visualización de especies con gráfico**")
 means = df_kmeans.groupby("cluster").mean().round(2)
 features = ["culmen_length_mm", "culmen_depth_mm", "flipper_length_mm", "body_mass_g"]  #SOLO NUMERICAS
 angles = np.linspace(0, 2 * np.pi, len(features), endpoint=False).tolist()

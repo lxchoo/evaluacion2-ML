@@ -1,29 +1,23 @@
-from allDataframes import df_og
-from allDataframes import df_pinguinos
-from allDataframes import df_clean
 from allDataframes import df_preprocesado
+from allDataframes import X
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-st.title("Clustering de pingüinos")
-
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-X = scaler.fit_transform(df_clean)
+st.title("Clustering de pingüinos - KMeans")
 
 #CLUSTERING KMEANS
-from sklearn.cluster import KMeans
-st.markdown("## **Clustering Kmeans**")
     #GRÁFICO DEL CODO
 st.markdown("### Gráfico del codo")
-num_clusters = range(1, 11)
-kmeans = [KMeans(n_clusters=i) for i in num_clusters]
+number_clusters = range(1, 11)
+kmeans = [KMeans(n_clusters=i, random_state=42) for i in number_clusters]
 score = [kmeans[i].fit(X).score(X) for i in range(len(kmeans))]
 fig, ax = plt.subplots()
-ax.plot(num_clusters, score)
+ax.plot(number_clusters, score)
 ax.grid()
 ax.set_xlabel('Número de Clusters')
 ax.set_ylabel('Score')
@@ -41,7 +35,6 @@ df_kmeans = df_preprocesado.copy()
 df_kmeans.insert(0, "cluster", kmeans_res)
     #MÉTRICAS DE EVALUACIÓN
 st.markdown("## Métricas de evaluación")
-from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 silhouette = silhouette_score(df_preprocesado, kmeans_res)
 db_index = davies_bouldin_score(df_preprocesado, kmeans_res)
 ch_index = calinski_harabasz_score(df_preprocesado, kmeans_res)
@@ -59,7 +52,7 @@ col1, col2 = st.columns(2)
 with col1:
     x_feature = st.selectbox("Selecciona feature para eje X:", 
                             df_preprocesado.columns, 
-                            index=0)
+                            index=3)
 with col2:
     y_feature = st.selectbox("Selecciona feature para eje Y:", 
                             df_preprocesado.columns, 
@@ -80,13 +73,13 @@ st.pyplot(fig1)
     #VISUALIZACIÓN DE ESPECIES CON GRÁFICO ARAÑA
 st.markdown("### **Visualización de especies con gráfico**")
 means = df_kmeans.groupby("cluster").mean().round(2)
-features = ["culmen_length_mm", "culmen_depth_mm", "flipper_length_mm", "body_mass_g"]  #SOLO NUMERICAS
+features = ["culmen_length_mm", "culmen_depth_mm", "flipper_length_mm", "body_mass_g"]
 angles = np.linspace(0, 2 * np.pi, len(features), endpoint=False).tolist()
 angles += angles[:1]
 fig2, ax2 = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
 for i, (index, row) in enumerate(means.iterrows()):
     values = row[features].tolist()
-    values += values[:1]  # cerrar el círculo
+    values += values[:1]
     ax2.plot(angles, values, label=f"Cluster {index}")
     ax2.fill(angles, values, alpha=0.1)
 ax2.set_xticks(angles[:-1])

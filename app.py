@@ -1,7 +1,8 @@
 import streamlit as st
 
 datasets = st.Page("Datasets.py", title="Datasets", icon=":material/dataset:")
-clustering = st.Page("ClusteringPenguins.py", title="Clustering", icon=":material/linked_services:")
+kmeans = st.Page("kmeans.py", title="KMeans", icon=":material/linked_services:")
+jerarquico = st.Page("jerarquico.py", title="Clustering Jerárquico", icon=":material/tenancy:")
 
-pg = st.navigation([datasets, clustering])
+pg = st.navigation([datasets, kmeans, jerarquico])
 pg.run()

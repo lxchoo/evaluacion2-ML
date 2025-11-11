@@ -26,9 +26,13 @@ st.pyplot(fig)
 st.write("Lo más optimo sería usar 4 clusters en el agrupamiento.")
     #CLUSTERING
 st.markdown("## Parámetros")
-num_clusters = st.number_input("Cantidad de clusters", 2, 10)
-r_state = st.number_input("Random state", 1, 50)
-num_init = st.number_input("n_init", 1, 50)
+colClusters, colState, colInit = st.columns(3)
+with colClusters:
+    num_clusters = st.number_input("Cantidad de clusters", 2, 10)
+with colState:
+    r_state = st.number_input("Random state", 1, 50)
+with colInit:
+    num_init = st.number_input("n_init", 1, 50)
 kmeans = KMeans(n_clusters=num_clusters, random_state=r_state, n_init=num_init)
 kmeans_res = kmeans.fit_predict(df_preprocesado)
 df_kmeans = df_preprocesado.copy()
@@ -48,12 +52,12 @@ st.write(df_kmeans)
 st.write("Cantidad de pingüinos por cluster")
 st.write(df_kmeans.cluster.value_counts())
 st.markdown("### Scatter Plot Interactivo")
-col1, col2 = st.columns(2)
-with col1:
+colX, colY = st.columns(2)
+with colX:
     x_feature = st.selectbox("Selecciona feature para eje X:", 
                             df_preprocesado.columns, 
                             index=3)
-with col2:
+with colY:
     y_feature = st.selectbox("Selecciona feature para eje Y:", 
                             df_preprocesado.columns, 
                             index=1)

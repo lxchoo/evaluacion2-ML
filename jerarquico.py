@@ -18,8 +18,11 @@ dend = shc.dendrogram(shc.linkage(df_preprocesado, method='ward'))
 st.pyplot(fig)
     #CLUSTERING
 st.markdown("## Parámetros")
-num_clusters = st.number_input("Cantidad de clusters", 2, 10)
-link = st.selectbox("Linkage", ["ward", "complete", "average", "single"])
+colClusters, colLinkage = st.columns(2)
+with colClusters:
+    num_clusters = st.number_input("Cantidad de clusters", 2, 10)
+with colLinkage:
+    link = st.selectbox("Linkage", ["ward", "complete", "average", "single"])
 clustering = AgglomerativeClustering(n_clusters=num_clusters, linkage=link)
 cj_res = clustering.fit_predict(df_preprocesado)
 df_cj = df_preprocesado.copy()
